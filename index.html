@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rubrik Penilaian Presentasi Kelompok</title>
+<meta name="description" content="Aplikasi Penilaian Presentasi Kelompok Berbasis Rubrik">
+<style>
+:root {
+  --color-cream-50: rgba(252,252,249,1);
+  --color-cream-100: rgba(255,255,253,1);
+  --color-gray-200: rgba(245,245,245,1);
+  --color-gray-400: rgba(119,124,124,1);
+  --color-slate-500: rgba(98,108,113,1);
+  --color-brown-600: rgba(94,82,64,1);
+  --color-charcoal-700: rgba(31,33,33,1);
+  --color-slate-900: rgba(19,52,59,1);
+  --color-teal-500: rgba(33,128,141,1);
+  --color-teal-600: rgba(29,116,128,1);
+  --color-red-500: rgba(192,21,47,1);
+  --color-green-500: rgba(34,197,94,1);
+  --color-orange-500: rgba(168,75,47,1);
+  --color-teal-500-rgb: 33,128,141;
+  --color-brown-600-rgb: 94,82,64;
+  --color-background: var(--color-cream-50);
+  --color-surface: var(--color-cream-100);
+  --color-text: var(--color-slate-900);
+  --color-text-secondary: var(--color-slate-500);
+  --color-primary: var(--color-teal-500);
+  --color-border: rgba(var(--color-brown-600-rgb),0.2);
+  --color-card-border: rgba(var(--color-brown-600-rgb),0.12);
+  --color-btn-primary-text: var(--color-cream-50);
+  --color-error: var(--color-red-500);
+  --color-success: var(--color-green-500);
+  --color-warning: var(--color-orange-500);
+  --color-focus-ring: rgba(var(--color-teal-500-rgb),0.4);
+  --font-family-base: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Inter",sans-serif;
+  --font-family-mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  --radius-base: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.04),0 1px 2px rgba(0,0,0,0.02);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.04),0 2px 4px -1px rgba(0,0,0,0.02);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.04),0 4px 6px -2px rgba(0,0,0,0.02);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.16,1,0.3,1);
+  --score-100: #0d9488;
+  --score-80: #2563eb;
+  --score-60: #d97706;
+  --score-40: #ea580c;
+  --score-20: #dc2626;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family-base);
+  background: var(--color-background);
+  color: var(--color-text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+.app-header {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-card-border);
+  padding: 20px 24px;
+}
+.app-header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-header p {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0 0;
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 80px;
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 600px) {
+  .info-grid { grid-template-columns: 1fr; }
+}
+.form-group { margin-bottom: 0; position: relative; z-index: 1; }
+.form-group:focus-within { z-index: 10; }
+.form-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+.form-input, .form-select {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: var(--font-family-base);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2398108113' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+.form-input:focus, .form-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+.autocomplete-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-lg);
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 9999;
+  display: none;
+  margin-top: 4px;
+}
+.autocomplete-dropdown.show { display: block; }
+.autocomplete-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-card-border);
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover { background: rgba(var(--color-brown-600-rgb),0.12); }
+.autocomplete-item-name {
+  font-weight: 500;
+  color: var(--color-text);
+}
+.autocomplete-item-nim {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family-mono);
+}
+.autocomplete-item-prodi {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+.selected-students {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.student-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(var(--color-teal-500-rgb),0.1);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+}
+.student-tag-remove {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all var(--duration-fast);
+}
+.student-tag-remove:hover {
+  background: rgba(220,38,38,0.2);
+  color: var(--color-error);
+}
+.config-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.config-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.progress-container { margin-bottom: 24px; }
+.progress-bar {
+  height: 6px;
+  background: rgba(var(--color-brown-600-rgb),0.12);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), #2ea6c2);
+  border-radius: var(--radius-full);
+  transition: width var(--duration-normal) var(--ease-standard);
+  width: 0%;
+}
+.progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+.rubric-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+.rubric-card.completed {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-teal-500-rgb), 0.02);
+}
+.rubric-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+}
+.rubric-card-header:hover { background: rgba(var(--color-brown-600-rgb),0.12); }
+.criteria-info { flex: 1; }
+.criteria-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0;
+}
+.criteria-weight {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin-top: 2px;
+}
+.score-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-family-mono);
+  color: var(--color-text-secondary);
+}
+.score-value.scored { color: var(--color-primary); }
+.chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-secondary);
+  transition: transform var(--duration-normal) var(--ease-standard);
+}
+.rubric-card.open .chevron { transform: rotate(180deg); }
+.rubric-card-body {
+  display: grid;
+  grid-template-rows: 0fr;
+  padding: 0 20px;
+  transition: grid-template-rows var(--duration-normal) var(--ease-standard);
+}
+.rubric-card.open .rubric-card-body {
+  grid-template-rows: 1fr;
+  padding-bottom: 20px;
+}
+.rubric-card-body-inner { overflow: hidden; }
+.score-options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+@media (max-width: 700px) {
+  .score-options { grid-template-columns: 1fr; }
+}
+.score-option { position: relative; cursor: pointer; }
+.score-option input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.score-option-label {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  transition: all var(--duration-fast) var(--ease-standard);
+  height: 100%;
+}
+.score-option-label:hover { border-color: var(--color-primary); }
+.score-option input:checked + .score-option-label {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-teal-500-rgb), 0.08);
+}
+.score-option-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.score-option-number {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-family-mono);
+}
+.score-option[data-score="5"] .score-option-number { color: var(--score-100); }
+.score-option[data-score="4"] .score-option-number { color: var(--score-80); }
+.score-option[data-score="3"] .score-option-number { color: var(--score-60); }
+.score-option[data-score="2"] .score-option-number { color: var(--score-40); }
+.score-option[data-score="1"] .score-option-number { color: var(--score-20); }
+.score-option-grade {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+.score-option[data-score="5"] .score-option-grade { background: rgba(13,148,136,0.12); color: var(--score-100); }
+.score-option[data-score="4"] .score-option-grade { background: rgba(37,99,235,0.12); color: var(--score-80); }
+.score-option[data-score="3"] .score-option-grade { background: rgba(217,119,6,0.12); color: var(--score-60); }
+.score-option[data-score="2"] .score-option-grade { background: rgba(234,88,12,0.12); color: var(--score-40); }
+.score-option[data-score="1"] .score-option-grade { background: rgba(220,38,38,0.12); color: var(--score-20); }
+.score-option-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.score-option-desc {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+.summary-bar {
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.summary-title {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: 16px;
+}
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+@media (max-width: 600px) {
+  .summary-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.summary-item { text-align: center; }
+.summary-item-label {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+.summary-item-value {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: var(--font-family-mono);
+}
+.summary-item-value.grade-A { color: var(--score-100); }
+.summary-item-value.grade-B { color: var(--score-80); }
+.summary-item-value.grade-C { color: var(--score-60); }
+.summary-item-value.grade-D { color: var(--score-40); }
+.summary-item-value.grade-E { color: var(--score-20); }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+.btn-primary:hover:not(:disabled) { background: var(--color-teal-600); }
+.btn-secondary {
+  background: rgba(var(--color-brown-600-rgb),0.12);
+  color: var(--color-text);
+}
+.btn-secondary:hover { background: rgba(var(--color-brown-600-rgb),0.2); }
+.btn.loading {
+  position: relative;
+  pointer-events: none;
+}
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-btn-primary-text);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  right: 20px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.action-bar {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--color-surface);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  padding: 12px 20px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 9999;
+  opacity: 0;
+  transition: all var(--duration-normal) var(--ease-standard);
+}
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+.toast.success { border-left: 4px solid var(--color-success); }
+.toast.error { border-left: 4px solid var(--color-error); }
+.toast.info { border-left: 4px solid var(--color-primary); }
+.toast-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.toast.success .toast-icon { color: var(--color-success); }
+.toast.error .toast-icon { color: var(--color-error); }
+.toast.info .toast-icon { color: var(--color-primary); }
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+}
+.modal-overlay.show { opacity: 1; pointer-events: auto; }
+.modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: var(--shadow-lg);
+}
+.modal-title { font-size: 16px; font-weight: 600; margin: 0 0 12px 0; }
+.modal-text { font-size: 14px; color: var(--color-text-secondary); margin: 0 0 20px 0; }
+.modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+.btn-danger { background: var(--color-error); color: white; }
+.btn-danger:hover { filter: brightness(0.9); }
+@media print {
+  .app-header, .action-bar { display: none; }
+  body { background: white; }
+}
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div>
+    <h1>
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Rubrik Penilaian Presentasi
+    </h1>
+    <p>Manajemen Bencana - S1 Kesehatan Masyarakat</p>
+  </div>
+</header>
+
+<main class="container">
+  <div class="config-section">
+    <h3>
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+      Informasi Kelompok
+    </h3>
+    <div class="info-grid">
+      <div class="form-group">
+        <label class="form-label" for="kelas">Kelas *</label>
+        <select class="form-select" id="kelas" required>
+          <option value="">Pilih Kelas</option>
+          <option value="A">Kelas A</option>
+          <option value="B">Kelas B</option>
+          <option value="C">Kelas C</option>
+          <option value="D">Kelas D</option>
+          <option value="E">Kelas E</option>
+          <option value="F">Kelas F</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="kelompok">Kelompok *</label>
+        <input class="form-input" type="text" id="kelompok" placeholder="Contoh: 1, 2, 3" required autocomplete="off">
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label class="form-label" for="nama-mahasiswa">Anggota Kelompok (4-5 mahasiswa) *</label>
+        <input class="form-input" type="text" id="nama-mahasiswa" placeholder="Ketik nama untuk mencari mahasiswa..." required autocomplete="off">
+        <div class="autocomplete-dropdown" id="student-dropdown"></div>
+        <div class="selected-students" id="selected-students"></div>
+        <div id="student-count-hint" style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">0/5 anggota ditambahkan</div>
+      </div>
+      <div class="form-group" style="grid-column: 1 / -1;">
+        <label class="form-label" for="topik">Topik Presentasi</label>
+        <input class="form-input" type="text" id="topik" placeholder="Ketik untuk mencari topik..." list="topics-list" autocomplete="off">
+        <datalist id="topics-list">
+          <option value="Regulasi dan kerangka kerja manajemen bencana secara global dan nasional">
+          <option value="Siklus manajemen bencana">
+          <option value="Triage, First Aid dan respons dalam manajemen bencana">
+          <option value="Pemulihan berbasis komunitas">
+          <option value="Surveilans epidemiologi dan pengendalian penyakit menular selama dan pasca bencana">
+          <option value="Air, sanitasi, dan lingkungan dalam situasi bencana">
+          <option value="Kebutuhan gizi, kesehatan reproduksi dan dukungan psikososial dalam bencana">
+        </datalist>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+    <div class="progress-text">
+      <span id="progress-text">0 dari 3 kriteria dinilai</span>
+      <span id="progress-percent">0%</span>
+    </div>
+  </div>
+
+  <div id="rubric-cards"></div>
+
+  <div class="summary-bar">
+    <div class="summary-title">Ringkasan Nilai</div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-item-label">Presentasi (30%)</div>
+        <div class="summary-item-value" id="sum-c1">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-label">Kasus (40%)</div>
+        <div class="summary-item-value" id="sum-c2">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-label">Fasilitasi (30%)</div>
+        <div class="summary-item-value" id="sum-c3">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-item-label">Nilai Akhir (0-100)</div>
+        <div class="summary-item-value grade" id="sum-final">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-primary" id="btn-submit" disabled>
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      Kirim Nilai
+    </button>
+    <button class="btn btn-secondary" id="btn-reset">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+      Reset Form
+    </button>
+  </div>
+</main>
+
+<div class="toast" id="toast">
+  <span class="toast-icon" id="toast-icon"></span>
+  <span id="toast-message"></span>
+</div>
+
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <h2 class="modal-title" id="modal-title">Konfirmasi</h2>
+    <p class="modal-text" id="modal-text"></p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" id="modal-cancel">Batal</button>
+      <button class="btn btn-danger" id="modal-confirm">Ya, Lanjutkan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+'use strict';
+
+// Google Sheet URL - Pre-configured
+const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbwJbzZR2CGSO2ATphxEfRYNz8VLTy_gLgHBQvas97H2IIQIAdNge939SyGuS4fpVStVsQ/exec';
+
+// Rubric Data
+const RUBRIC_DATA = [
+  {
+    id: 'presentasi',
+    name: '1. Kualitas Presentasi Materi Teori',
+    weight: 30,
+    scores: [
+      { value: 5, label: 'Excellent', title: 'Mastery & Relevan', desc: 'Penyaji menguasai materi tanpa teks. Penjelasan teori sangat jernih dan secara eksplisit menjadi "kunci" untuk memecahkan kasus. Visual slide menarik & ringkas.' },
+      { value: 4, label: 'Good', title: 'Jelas & Terstruktur', desc: 'Penyaji memahami materi dengan baik. Penjelasan teori relevan dengan kasus. Slide standar namun informatif.' },
+      { value: 3, label: 'Average', title: 'Membaca Slide', desc: 'Penyaji cenderung membaca teks di slide. Materi teori benar, namun penyampaiannya monoton. Hubungan dengan kasus ada tapi kurang ditegaskan.' },
+      { value: 2, label: 'Poor', title: 'Kurang Akurat', desc: 'Terdapat kesalahan konsep dalam penjelasan teori. Slide penuh teks (copy-paste). Sulit dipahami mahasiswa.' },
+      { value: 1, label: 'Very Poor', title: 'Tidak Siap', desc: 'Materi tidak lengkap, melenceng dari topik. Penyaji tidak menguasai materi sama sekali (bingung saat ditanya).' }
+    ]
+  },
+  {
+    id: 'kasus',
+    name: '2. Kualitas Penulisan Kasus — Kreativitas & Logika',
+    weight: 40,
+    scores: [
+      { value: 5, label: 'Excellent', title: 'Kompleks & Ambigu', desc: 'Kasus cukup menggambarkan kondisi yang realistis (dilematis). Data terstruktur rapi untuk memicu debat. Memenuhi kaidah 4S (Significant, Same, Specific, Simultaneous).' },
+      { value: 4, label: 'Good', title: 'Realistis', desc: 'Kasus masuk akal dan relevan. Data cukup lengkap. Ada dilema keputusan, meski tidak terlalu tajam. Struktur jelas.' },
+      { value: 3, label: 'Average', title: 'Terlalu Sederhana', desc: 'Kasus mudah ditebak (hitam-putih), kurang menantang. Struktur kasus ada, tapi alurnya linier (seperti soal cerita biasa, bukan kasus).' },
+      { value: 2, label: 'Poor', title: 'Membingungkan', desc: 'Data kasus tidak logis atau kontradiktif (bukan karena disengaja, tapi karena salah buat). Alur cerita lompat-lompat.' },
+      { value: 1, label: 'Very Poor', title: 'Asal', desc: 'Copy-paste kasus dari internet tanpa modifikasi. Atau kasus tidak relevan dengan topik. Tidak ada struktur data.' }
+    ]
+  },
+  {
+    id: 'fasilitasi',
+    name: '3. Skill Fasilitasi — Kepemimpinan Kelas',
+    weight: 30,
+    scores: [
+      { value: 5, label: 'Excellent', title: 'Leader & Provokator', desc: 'Sangat terampil memancing debat ("Why A? Why not B?"). Penggunaan Papan Tulis/Media sangat rapi (memisahkan Fakta vs Opini). Tidak mendominasi.' },
+      { value: 4, label: 'Good', title: 'Fasilitator Aktif', desc: 'Mampu memimpin diskusi dan menjaga alur waktu. Menggunakan papan tulis dengan cukup baik. Sesekali masih terlalu banyak bicara/ceramah.' },
+      { value: 3, label: 'Average', title: 'Pasif / Dominan', desc: 'Cenderung menjawab sendiri pertanyaan kasusnya (tidak sabar). Atau papan tulis tidak digunakan efektif (hanya bicara lisan).' },
+      { value: 2, label: 'Poor', title: 'Kehilangan Kontrol', desc: 'Diskusi melantur tanpa arah. Tidak bisa menengahi perdebatan kelas. Papan tulis kosong.' },
+      { value: 1, label: 'Very Poor', title: 'Tidak Berfungsi', desc: 'Diam saja di depan kelas. Membiarkan kelas hening atau ribut sendiri. Tidak ada usaha memimpin.' }
+    ]
+  }
+];
+
+// Student Data - All classes
+const STUDENTS_DATA = {
+  "A": [
+    {"nim": "2410713032", "nama": "Dinda Ramadhani Nazar'Nur", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713077", "nama": "Philipus Marco Mukin", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713084", "nama": "Dimmas Pratama Kusmana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713089", "nama": "Adnan Hasan Khadafi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713093", "nama": "Muhammad Arifin", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713106", "nama": "Dimas Maulana Ksatria Tanjung", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713107", "nama": "Mafiroh Dwi Saputri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713109", "nama": "Talyaa Ayumi Subhan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713110", "nama": "Dhiya Anggoro Kasih Simarmata", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713111", "nama": "Rajwa Naila Husna", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713113", "nama": "Yuliza", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713115", "nama": "Nailah Keisha Kaula Shapira", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713116", "nama": "Daffa Inayah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713119", "nama": "Bagas Fahmi Irawan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713120", "nama": "Nadya Mulya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713124", "nama": "Pramudhia Ariq Falah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713127", "nama": "Fidiyah Azzahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713136", "nama": "Haikal Ansori Darmawan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713145", "nama": "Ghania Naira Aqila", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713148", "nama": "Salsabila Kamila Ramadhani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713150", "nama": "Mutiara Magfira Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713156", "nama": "Kaisya Sabrina Mutia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713173", "nama": "Kimi Myisha Azira", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713174", "nama": "Jasmine Najla Purba", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713180", "nama": "Nabila Sakina Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713185", "nama": "Cecilia Keisha Markes", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713187", "nama": "Delima Oktafiya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713188", "nama": "Agnes Nur Sintha Sihotang", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713194", "nama": "Sheyla Sae Utami", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713196", "nama": "Tikauli Cristina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713197", "nama": "Muhammad Rizky Febriano", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713205", "nama": "Cleo Ardelia Purwanto", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ],
+  "B": [
+    {"nim": "2410713142", "nama": "Natalie Anasthacia Prasetyo", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713144", "nama": "Clarissa Putri Rabiah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713146", "nama": "Aura Az zahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713154", "nama": "Darito Ulung Mandiri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713158", "nama": "Siti Marwatin Wandilah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713159", "nama": "Ahmad Zaidan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713160", "nama": "Orlando Kent Shane Natalino", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713161", "nama": "Ranya Nashita Wibisono", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713166", "nama": "Sabina Az Zahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713168", "nama": "Yuda Tri Astoto", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713169", "nama": "Tiara Putri Ariyono", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713172", "nama": "Tegar Rizky Al Ghifari", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713176", "nama": "Kartika Dwi Mufida", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713179", "nama": "Salsabila Amirah Noviani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713181", "nama": "Nabila Azahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713182", "nama": "Mutiara Rahmi Wardani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713183", "nama": "Faulika Galuh Utami", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713186", "nama": "Naila Husni Utami", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713190", "nama": "Reisya Ivana Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713191", "nama": "Nafisa Aulia Fakhira", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713192", "nama": "Adinda Azyyati Maudina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713193", "nama": "Abdul Fattaah Zakyasyraf", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713195", "nama": "Nasywa Tsabita Resdiani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713198", "nama": "Arza Rayhan Ramadhan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713199", "nama": "Athaya Dheanaliya Hariawan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713203", "nama": "Ardhea Afidalaura", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713204", "nama": "Karrolina Loppez Zaenab Waode", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713206", "nama": "Reagita Meitebina Sembiring Brahmana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713207", "nama": "Mayra Indri Hartantina Sawitri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713208", "nama": "Deva Deviani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713209", "nama": "Muhamad Haikal Anzavi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ],
+  "C": [
+    {"nim": "2210713073", "nama": "Almeria Annisa Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2022"},
+    {"nim": "2410713071", "nama": "Najwa Namira Azizah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713072", "nama": "Najla Adhisty Syawalia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713073", "nama": "revalina safitri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713075", "nama": "Hasonangan Nainggolan", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713076", "nama": "Agung Dwi Prasetyo", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713078", "nama": "Izma Choirunnisa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713086", "nama": "Rachtrinissa Rywiyanti", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713087", "nama": "Pramitha Dewia Maharany", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713088", "nama": "Satriyanti Handayani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713092", "nama": "Alya Tsabitahhaq Putri Aditya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713095", "nama": "Athiya Hanifa Raina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713096", "nama": "Kavindri Zahid Rafasya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713097", "nama": "Catharine Zepanya Girsang", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713102", "nama": "Alyaa Qurraru Aini", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713103", "nama": "Nayla Zaskia Salsabilla Sjahrie", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713104", "nama": "Alifvia Putri Yasmini", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713105", "nama": "Kansya Hafsari Soleha", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713112", "nama": "Aulia Dizza Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713114", "nama": "Rizka Rahmaditha", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713118", "nama": "Tania Pisarani Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713121", "nama": "Shifa Zanira Azahrah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713122", "nama": "Almira Desnatrian", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713123", "nama": "Naila Auryn Fawwaza", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713126", "nama": "Aliyah Mina Balqis", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713128", "nama": "Mika Amelia Br Sinaga", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713129", "nama": "Qeysya Firdawa Zulianti", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713130", "nama": "Zakhila Cahya Kyona Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713131", "nama": "Elza Putri Herliansyah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713132", "nama": "Wan Meelfha Rachman", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713133", "nama": "Camelia Putri Devina Wibowo", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713135", "nama": "Maria Regina Tresari Nugroho", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713139", "nama": "Michele Chendrawasih", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ],
+  "D": [
+    {"nim": "2410713001", "nama": "Nayla Fazila Maulidina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713002", "nama": "Niswa Tazkiah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713005", "nama": "Nayla Inez Rachmawati", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713007", "nama": "Nasywa Maulidia Agustina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713008", "nama": "Ardini Ramadhania", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713009", "nama": "Aisyah Luna Lampard", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713010", "nama": "Ratna Junita Zendrato", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713011", "nama": "Mahda Nurfadilah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713013", "nama": "Febyana Nur Atika", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713014", "nama": "Marta Kurniawati Harefa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713015", "nama": "Stella Margareth Sitorus", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713016", "nama": "Rahma Aprilia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713018", "nama": "Pera Amanda", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713019", "nama": "Shallu Anindya Vandani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713020", "nama": "Alya Aziza", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713021", "nama": "Citra Aulia Rahma", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713022", "nama": "Maryam Almas El Shabrina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713023", "nama": "Sahda Aulia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713024", "nama": "Zarra Febrianti", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713027", "nama": "Diandra Rezkia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713029", "nama": "Anindita Yudhonagoro", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713033", "nama": "Kezia Septiani Lumban Batu", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713034", "nama": "Angel Octavia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713035", "nama": "Meilinda Deliano Yasmine", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713045", "nama": "Taqiyya Samira", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713051", "nama": "Alyka Maharani Kanaya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713052", "nama": "Andara Dewi Romadhona", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713061", "nama": "Aisya Novi Rachmadani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713063", "nama": "Puspita Triagma Fauziah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713065", "nama": "Purwandari Kusumaningtias", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713067", "nama": "Putri Nabilah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713068", "nama": "Finy Zulfa Rahmi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713070", "nama": "Nasywa Kafka Nafisa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713155", "nama": "Callysta Az Zahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ],
+  "E": [
+    {"nim": "2410713003", "nama": "Fabian Wahyu Aji", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713004", "nama": "Aldin Putra Iman Telaumbanua", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713006", "nama": "Nabilah Sarah Vina", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713012", "nama": "Chantika Aprilia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713017", "nama": "Indah Rizky Rahmadana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713025", "nama": "Anayla Khayrani Azalia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713026", "nama": "Hasnafira Putri Radipah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713028", "nama": "Asyifah Nuranisya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713030", "nama": "Saskia Ayu Namira Triandini", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713031", "nama": "Aisha Rania Syafiqa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713036", "nama": "Nabila Fitriani Ishak", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713040", "nama": "Faiza Alyssa Fairuz", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713044", "nama": "Luthfiah Nibras Khotaman", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713046", "nama": "Gabriela Dwi Kartika Sari", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713048", "nama": "Ratu Raihana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713049", "nama": "Nur Anna Irvania", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713054", "nama": "Gebi Angel Dwiharsita", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713055", "nama": "Keysha Arumandani Pramono", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713058", "nama": "Yasmine Octavia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713060", "nama": "Hana Anindya Lathifa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713064", "nama": "Fina Fauziah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713069", "nama": "Adalya Yasmin Krisnahadi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713079", "nama": "Eryl Candra Nova", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713080", "nama": "Jenita", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713082", "nama": "Shalomitha Ayu Kusumaningtias", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713085", "nama": "Sally odelina wihardja", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713090", "nama": "Najwa Candra Ayudya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713094", "nama": "Fitri Nurkhafi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713099", "nama": "Sarah Azzahra Ramadhani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713100", "nama": "Arminanda Khansa Sadiya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713141", "nama": "Muhammad Hussein Dhya' Ulhaq", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713143", "nama": "Mohamad Umar Ruhul Juhdi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713147", "nama": "Muhammad Ramadhani Firmansyah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713157", "nama": "Najmi Fathya Rakhmadini", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713178", "nama": "Fathiya Adzkiya Syahidah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713184", "nama": "Faiz Jauhari Vesgio", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713200", "nama": "Bianca Junita Fakhti", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713201", "nama": "Malika Aliya Noor Zarifa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713202", "nama": "Karina Putri Nabila", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ],
+  "F": [
+    {"nim": "2410713037", "nama": "Karina Aulia Annasyah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713038", "nama": "Bulan Nasywa Adinda Listy", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713039", "nama": "Najwa Sabilaa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713041", "nama": "Dona Salsabila", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713042", "nama": "Maudia Putriana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713043", "nama": "Najwa Nadia Rahma", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713047", "nama": "Nadira Shafiqa Amini", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713050", "nama": "Cindy Silfina Yulia Silaban", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713053", "nama": "Ramizah Atikah Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713056", "nama": "Alila Yusdahlia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713057", "nama": "Shavira Riandra Shalihah Marsono", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713059", "nama": "Joanna Patricia A.Nduru", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713062", "nama": "Annisaa Mega Pratiwi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713066", "nama": "Nayla Zahra", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713074", "nama": "Gendis Alifya Maharani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713081", "nama": "Nazwa Alya Cantika", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713083", "nama": "Joyvela Jethro Anabel", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713098", "nama": "Yemima Frisda Simbolon", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713101", "nama": "Nur Fatimah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713108", "nama": "Saskia Khairun Nisa", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713117", "nama": "Lomyanti Elserina Sinaga", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713125", "nama": "Irna Firmansyah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713137", "nama": "Nazwa Nur Septhiani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713138", "nama": "Salwa Fitriana Chantika", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713140", "nama": "Nasya Azwa Zahra Putri", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713149", "nama": "Najwaa Rifaa Sakinah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713151", "nama": "Salsabila Putri Priyadi", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713152", "nama": "Alysa Putri Shafira", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713153", "nama": "Nessa Ayu Octaviana", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713162", "nama": "Cisillia Angelica Firmansyah", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713163", "nama": "Tirta Nirmaya", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713164", "nama": "Siti Rasyiqa Nayyara", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713165", "nama": "Rafeylah Rameyza", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713167", "nama": "Tyara Maharani", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713170", "nama": "Rahma Aulia", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
+    {"nim": "2410713171", "nama": "Linda Nur Adhania", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"}
+  ]
+};
+
+// State
+let state = {
+  scores: {},
+  selectedStudents: []
+};
+
+// DOM Elements
+const E = {
+  rubricCards: document.getElementById('rubric-cards'),
+  summaryC1: document.getElementById('sum-c1'),
+  summaryC2: document.getElementById('sum-c2'),
+  summaryC3: document.getElementById('sum-c3'),
+  summaryFinal: document.getElementById('sum-final'),
+  progressFill: document.getElementById('progress-fill'),
+  progressText: document.getElementById('progress-text'),
+  progressPercent: document.getElementById('progress-percent'),
+  submitBtn: document.getElementById('btn-submit'),
+  resetBtn: document.getElementById('btn-reset'),
+  toast: document.getElementById('toast'),
+  toastMessage: document.getElementById('toast-message'),
+  toastIcon: document.getElementById('toast-icon'),
+  confirmModal: document.getElementById('confirm-modal'),
+  modalTitle: document.getElementById('modal-title'),
+  modalText: document.getElementById('modal-text'),
+  modalConfirm: document.getElementById('modal-confirm'),
+  modalCancel: document.getElementById('modal-cancel'),
+  kelasSelect: document.getElementById('kelas'),
+  namaInput: document.getElementById('nama-mahasiswa'),
+  studentDropdown: document.getElementById('student-dropdown'),
+  selectedStudentsContainer: document.getElementById('selected-students')
+};
+
+// Utility
+const esc = str => { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; };
+
+const getGradeFrom5 = score => {
+  if (score >= 4.5) return 'A';
+  if (score >= 3.5) return 'B';
+  if (score >= 2.5) return 'C';
+  if (score >= 1.5) return 'D';
+  return 'E';
+};
+
+const convertTo100 = score5 => Math.round((score5 / 5) * 100);
+
+// Toast
+function showToast(msg, type = 'success') {
+  const icons = { success: '✓', error: '✕', info: 'ℹ' };
+  E.toastMessage.textContent = msg;
+  E.toastIcon.textContent = icons[type] || icons.info;
+  E.toast.className = 'toast ' + type;
+  setTimeout(() => E.toast.classList.add('show'), 10);
+  setTimeout(() => E.toast.classList.remove('show'), 3000);
+}
+
+// Modal
+let confirmCallback = null;
+function showConfirm(title, msg, onConfirm) {
+  E.modalTitle.textContent = title;
+  E.modalText.textContent = msg;
+  confirmCallback = onConfirm;
+  E.confirmModal.classList.add('show');
+}
+function hideModal() {
+  E.confirmModal.classList.remove('show');
+  confirmCallback = null;
+}
+
+// Student Autocomplete
+function setupStudentAutocomplete() {
+  let selectedIndex = -1;
+  let filteredStudents = [];
+
+  E.kelasSelect.addEventListener('change', function() {
+    E.studentDropdown.classList.remove('show');
+    E.namaInput.value = '';
+    const hintEl = document.getElementById('student-count-hint');
+    if (hintEl) {
+      if (this.value) {
+        hintEl.textContent = 'Ketik minimal 2 huruf nama mahasiswa...';
+        hintEl.style.color = 'var(--color-text-secondary)';
+      } else {
+        hintEl.textContent = 'Pilih kelas terlebih dahulu';
+        hintEl.style.color = 'var(--color-warning)';
+      }
+    }
+  });
+
+  E.namaInput.addEventListener('focus', function() {
+    if (!E.kelasSelect.value) {
+      showToast('Pilih kelas terlebih dahulu', 'info');
+      E.kelasSelect.focus();
+    }
+  });
+
+  E.namaInput.addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase().trim();
+    const kelas = E.kelasSelect.value;
+
+    if (query.length < 2 || !kelas) {
+      E.studentDropdown.classList.remove('show');
+      return;
+    }
+
+    const students = STUDENTS_DATA[kelas] || [];
+    filteredStudents = students.filter(s =>
+      s.nama.toLowerCase().includes(query) || s.nim.includes(query)
+    ).slice(0, 10);
+
+    if (filteredStudents.length === 0) {
+      E.studentDropdown.innerHTML = '<div class="autocomplete-item" style="cursor:default;">Tidak ditemukan</div>';
+      E.studentDropdown.classList.add('show');
+      return;
+    }
+
+    E.studentDropdown.innerHTML = filteredStudents.map(s => `
+      <div class="autocomplete-item" data-nim="${s.nim}">
+        <div class="autocomplete-item-name">${esc(s.nama)}</div>
+        <div class="autocomplete-item-nim">NIM: ${s.nim}</div>
+        <div class="autocomplete-item-prodi">${s.prodi} - Angkatan ${s.angkatan}</div>
+      </div>
+    `).join('');
+
+    E.studentDropdown.querySelectorAll('.autocomplete-item').forEach((item, index) => {
+      item.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        selectStudent(filteredStudents[index]);
+      });
+      item.addEventListener('click', () => selectStudent(filteredStudents[index]));
+    });
+
+    E.studentDropdown.classList.add('show');
+    selectedIndex = -1;
+  });
+
+  E.namaInput.addEventListener('keydown', function(e) {
+    const items = E.studentDropdown.querySelectorAll('.autocomplete-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      selectStudent(filteredStudents[selectedIndex]);
+    } else if (e.key === 'Escape') {
+      E.studentDropdown.classList.remove('show');
+    }
+  });
+
+  E.namaInput.addEventListener('blur', function() {
+    setTimeout(() => {
+      if (!E.studentDropdown.matches(':focus-within')) {
+        E.studentDropdown.classList.remove('show');
+      }
+    }, 150);
+  });
+
+  function updateSelection(items) {
+    items.forEach((item, index) => item.classList.toggle('selected', index === selectedIndex));
+  }
+}
+
+function selectStudent(student) {
+  if (state.selectedStudents.find(s => s.nim === student.nim)) {
+    showToast('Mahasiswa sudah ditambahkan', 'info');
+    E.namaInput.value = '';
+    E.studentDropdown.classList.remove('show');
+    return;
+  }
+  state.selectedStudents.push(student);
+  renderSelectedStudents();
+  E.namaInput.value = '';
+  E.studentDropdown.classList.remove('show');
+}
+
+function removeStudent(nim) {
+  state.selectedStudents = state.selectedStudents.filter(s => s.nim !== nim);
+  renderSelectedStudents();
+}
+
+window.removeStudent = removeStudent;
+
+function renderSelectedStudents() {
+  const hintEl = document.getElementById('student-count-hint');
+  if (state.selectedStudents.length === 0) {
+    E.selectedStudentsContainer.innerHTML = '';
+    hintEl.textContent = '0/5 anggota ditambahkan';
+    hintEl.style.color = 'var(--color-text-secondary)';
+    return;
+  }
+  E.selectedStudentsContainer.innerHTML = state.selectedStudents.map(s => `
+    <div class="student-tag">
+      <span>${esc(s.nama)}</span>
+      <span class="student-tag-remove" onclick="window.removeStudent('${s.nim}')">×</span>
+    </div>
+  `).join('');
+  hintEl.textContent = state.selectedStudents.length + '/5 anggota ditambahkan';
+  if (state.selectedStudents.length >= 4 && state.selectedStudents.length <= 5) {
+    hintEl.style.color = 'var(--color-success)';
+  } else if (state.selectedStudents.length > 5) {
+    hintEl.style.color = 'var(--color-error)';
+    hintEl.textContent += ' (terlalu banyak!)';
+  } else {
+    hintEl.style.color = 'var(--color-warning)';
+    hintEl.textContent += ' (butuh minimal 4)';
+  }
+}
+
+// Render Rubric Cards
+function renderRubricCards() {
+  E.rubricCards.innerHTML = RUBRIC_DATA.map(criteria => `
+    <div class="rubric-card open" data-criteria="${criteria.id}" id="card-${criteria.id}">
+      <div class="rubric-card-header">
+        <div class="criteria-info">
+          <div class="criteria-name">${criteria.name}</div>
+          <div class="criteria-weight">Bobot: ${criteria.weight}%</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="score-value" id="sv-${criteria.id}">—</div>
+          <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <div class="rubric-card-body">
+        <div class="rubric-card-body-inner">
+          <div class="score-options">
+            ${criteria.scores.map(s => `
+              <label class="score-option" data-score="${s.value}">
+                <input type="radio" name="score-${criteria.id}" value="${s.value}">
+                <div class="score-option-label">
+                  <div class="score-option-header">
+                    <span class="score-option-number">${s.value}</span>
+                    <span class="score-option-grade">${s.label}</span>
+                  </div>
+                  <div class="score-option-title">${s.title}</div>
+                  <div class="score-option-desc">${s.desc}</div>
+                </div>
+              </label>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.rubric-card-header').forEach(header => {
+    header.addEventListener('click', () => {
+      header.closest('.rubric-card').classList.toggle('open');
+    });
+  });
+
+  document.querySelectorAll('.score-option input').forEach(input => {
+    input.addEventListener('change', () => {
+      const criteriaId = input.name.replace('score-', '');
+      const value = parseInt(input.value, 10);
+      setScore(criteriaId, value);
+    });
+  });
+}
+
+function setScore(criteriaId, value) {
+  state.scores[criteriaId] = value;
+  const sv = document.getElementById(`sv-${criteriaId}`);
+  sv.textContent = value;
+  sv.classList.add('scored');
+  document.getElementById(`card-${criteriaId}`).classList.add('completed');
+  updateSummary();
+  updateProgress();
+}
+
+function updateSummary() {
+  const c1 = state.scores.presentasi;
+  const c2 = state.scores.kasus;
+  const c3 = state.scores.fasilitasi;
+
+  E.summaryC1.textContent = c1 !== undefined ? c1 : '—';
+  E.summaryC2.textContent = c2 !== undefined ? c2 : '—';
+  E.summaryC3.textContent = c3 !== undefined ? c3 : '—';
+
+  if (c1 !== undefined && c2 !== undefined && c3 !== undefined) {
+    const weighted = (c1 * 0.3) + (c2 * 0.4) + (c3 * 0.3);
+    const score100 = convertTo100(weighted);
+    const grade = getGradeFrom5(weighted);
+    E.summaryFinal.textContent = score100 + ' (' + grade + ')';
+    E.summaryFinal.className = 'summary-item-value grade grade-' + grade;
+    E.submitBtn.disabled = false;
+  } else {
+    E.summaryFinal.textContent = '—';
+    E.summaryFinal.className = 'summary-item-value grade';
+    E.submitBtn.disabled = true;
+  }
+}
+
+function updateProgress() {
+  const total = RUBRIC_DATA.length;
+  const completed = Object.keys(state.scores).length;
+  const percent = Math.round((completed / total) * 100);
+  E.progressFill.style.width = percent + '%';
+  E.progressText.textContent = `${completed} dari ${total} kriteria dinilai`;
+  E.progressPercent.textContent = percent + '%';
+}
+
+// Submit
+async function submitToGoogleSheets() {
+  const data = getFormData();
+  if (!data) return;
+
+  E.submitBtn.classList.add('loading');
+  E.submitBtn.disabled = true;
+  E.submitBtn.innerHTML = 'Mengirim...';
+
+  try {
+    await fetch(GOOGLE_SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+
+    showToast('Nilai berhasil dikirim!', 'success');
+    resetForm();
+  } catch (err) {
+    showToast('Gagal mengirim: ' + err.message, 'error');
+  } finally {
+    E.submitBtn.classList.remove('loading');
+    E.submitBtn.disabled = false;
+    E.submitBtn.innerHTML = '<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg> Kirim Nilai';
+  }
+}
+
+function getFormData() {
+  const kelas = E.kelasSelect.value;
+  const kelompok = document.getElementById('kelompok').value.trim();
+  const topik = document.getElementById('topik').value.trim();
+
+  if (!kelas) { showToast('Harap pilih Kelas', 'error'); return null; }
+  if (state.selectedStudents.length < 4 || state.selectedStudents.length > 5) {
+    showToast('Harap pilih 4-5 anggota kelompok (saat ini: ' + state.selectedStudents.length + ')', 'error');
+    return null;
+  }
+  if (!kelompok) { showToast('Harap isi Kelompok', 'error'); return null; }
+
+  const c1 = state.scores.presentasi;
+  const c2 = state.scores.kasus;
+  const c3 = state.scores.fasilitasi;
+
+  if (c1 === undefined || c2 === undefined || c3 === undefined) {
+    showToast('Harap isi semua komponen penilaian', 'error');
+    return null;
+  }
+
+  const weighted = (c1 * 0.3) + (c2 * 0.4) + (c3 * 0.3);
+  const score100 = convertTo100(weighted);
+  const namaList = state.selectedStudents.map(s => `${s.nama} (${s.nim})`).join(', ');
+
+  return {
+    kelas, kelompok, namaMahasiswa: namaList, topik,
+    skorPresentasi: c1, skorKasus: c2, skorFasilitasi: c3,
+    nilaiAkhir: score100,
+    grade: getGradeFrom5(weighted),
+    timestamp: new Date().toLocaleString('id-ID')
+  };
+}
+
+function resetForm() {
+  state.scores = {};
+  state.selectedStudents = [];
+
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  ['presentasi', 'kasus', 'fasilitasi'].forEach(id => {
+    const sv = document.getElementById('sv-' + id);
+    if (sv) { sv.textContent = '—'; sv.classList.remove('scored'); }
+    const card = document.getElementById('card-' + id);
+    if (card) card.classList.remove('completed');
+  });
+
+  E.summaryC1.textContent = '—';
+  E.summaryC2.textContent = '—';
+  E.summaryC3.textContent = '—';
+  E.summaryFinal.textContent = '—';
+  E.summaryFinal.className = 'summary-item-value grade';
+  E.submitBtn.disabled = true;
+
+  renderSelectedStudents();
+  updateProgress();
+  showToast('Form direset');
+}
+
+// Init
+function init() {
+  setupStudentAutocomplete();
+  renderRubricCards();
+  updateProgress();
+
+  E.submitBtn.addEventListener('click', submitToGoogleSheets);
+  E.resetBtn.addEventListener('click', () => {
+    showConfirm('Reset Form', 'Apakah Anda yakin ingin mereset semua data?', resetForm);
+  });
+
+  E.modalConfirm.addEventListener('click', () => {
+    if (confirmCallback) confirmCallback();
+    hideModal();
+  });
+  E.modalCancel.addEventListener('click', hideModal);
+  E.confirmModal.addEventListener('click', (e) => {
+    if (e.target === E.confirmModal) hideModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && E.confirmModal.classList.contains('show')) hideModal();
+  });
+}
+
+init();
+})();
+</script>
+</body>
+</html>
