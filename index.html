@@ -20,6 +20,7 @@
   --color-red-500: rgba(192,21,47,1);
   --color-green-500: rgba(34,197,94,1);
   --color-orange-500: rgba(168,75,47,1);
+  --color-yellow-500: rgba(234,179,8,1);
   --color-teal-500-rgb: 33,128,141;
   --color-brown-600-rgb: 94,82,64;
   --color-background: var(--color-cream-50);
@@ -33,6 +34,7 @@
   --color-error: var(--color-red-500);
   --color-success: var(--color-green-500);
   --color-warning: var(--color-orange-500);
+  --color-info: var(--color-teal-500);
   --color-focus-ring: rgba(var(--color-teal-500-rgb),0.4);
   --font-family-base: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Inter",sans-serif;
   --font-family-mono: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
@@ -110,7 +112,7 @@ body {
   color: var(--color-text-secondary);
   margin-bottom: 6px;
 }
-.form-input, .form-select {
+.form-input, .form-select, .form-textarea {
   width: 100%;
   padding: 10px 12px;
   font-size: 14px;
@@ -121,6 +123,10 @@ body {
   border-radius: var(--radius-base);
   transition: all var(--duration-fast) var(--ease-standard);
 }
+.form-textarea {
+  min-height: 80px;
+  resize: vertical;
+}
 .form-select {
   cursor: pointer;
   appearance: none;
@@ -129,7 +135,7 @@ body {
   background-position: right 12px center;
   padding-right: 36px;
 }
-.form-input:focus, .form-select:focus {
+.form-input:focus, .form-select:focus, .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-focus-ring);
@@ -188,6 +194,10 @@ body {
   font-size: 13px;
   font-weight: 500;
 }
+.student-tag.manual {
+  background: rgba(234,179,8,0.15);
+  color: #b45309;
+}
 .student-tag-remove {
   cursor: pointer;
   width: 16px;
@@ -201,6 +211,33 @@ body {
 .student-tag-remove:hover {
   background: rgba(220,38,38,0.2);
   color: var(--color-error);
+}
+.add-manual-section {
+  margin-top: 12px;
+  padding: 12px;
+  background: rgba(234,179,8,0.08);
+  border: 1px dashed var(--color-warning);
+  border-radius: var(--radius-base);
+}
+.add-manual-section.collapsed { display: none; }
+.add-manual-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #92400e;
+}
+.add-manual-header:hover { text-decoration: underline; }
+.add-manual-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  margin-top: 12px;
+}
+@media (max-width: 600px) {
+  .add-manual-form { grid-template-columns: 1fr; }
 }
 .config-section {
   background: var(--color-surface);
@@ -216,6 +253,33 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+.feedback-section {
+  background: linear-gradient(135deg, rgba(234,179,8,0.08) 0%, rgba(251,191,36,0.05) 100%);
+  border: 1px solid rgba(234,179,8,0.3);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.feedback-section h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #92400e;
+}
+.star-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: rgba(234,179,8,0.2);
+  color: #92400e;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 600;
 }
 .progress-container { margin-bottom: 24px; }
 .progress-bar {
@@ -425,6 +489,10 @@ body {
   color: var(--color-text);
 }
 .btn-secondary:hover { background: rgba(var(--color-brown-600-rgb),0.2); }
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
 .btn.loading {
   position: relative;
   pointer-events: none;
@@ -547,11 +615,28 @@ body {
         <input class="form-input" type="text" id="kelompok" placeholder="Contoh: 1, 2, 3" required autocomplete="off">
       </div>
       <div class="form-group" style="grid-column: 1 / -1;">
-        <label class="form-label" for="nama-mahasiswa">Anggota Kelompok (4-5 mahasiswa) *</label>
+        <label class="form-label" for="nama-mahasiswa">Anggota Kelompok (2-5 mahasiswa) *</label>
         <input class="form-input" type="text" id="nama-mahasiswa" placeholder="Ketik nama untuk mencari mahasiswa..." required autocomplete="off">
         <div class="autocomplete-dropdown" id="student-dropdown"></div>
         <div class="selected-students" id="selected-students"></div>
         <div id="student-count-hint" style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">0/5 anggota ditambahkan</div>
+
+        <!-- Add Manual Student Section -->
+        <div class="add-manual-section collapsed" id="add-manual-section">
+          <div class="add-manual-header" onclick="toggleManualSection()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+            Tambah Mahasiswa Manual (tidak ada di database)
+          </div>
+          <div class="add-manual-form">
+            <input class="form-input" type="text" id="manual-nama" placeholder="Nama Mahasiswa">
+            <input class="form-input" type="text" id="manual-nim" placeholder="NIM (opsional)">
+            <button class="btn btn-secondary btn-sm" onclick="addManualStudent()" style="align-self: end;">Tambah</button>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="toggleManualSection()" style="margin-top: 8px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+          Tambah Manual
+        </button>
       </div>
       <div class="form-group" style="grid-column: 1 / -1;">
         <label class="form-label" for="topik">Topik Presentasi</label>
@@ -567,6 +652,19 @@ body {
         </datalist>
       </div>
     </div>
+  </div>
+
+  <!-- Feedback Section -->
+  <div class="feedback-section">
+    <h3>
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      Catatan & Feedback
+      <span class="star-badge">
+        <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        Highlight Performa Siswa
+      </span>
+    </h3>
+    <textarea class="form-textarea" id="feedback-notes" placeholder="Catatan performa siswa yang menonjol (positif/negatif), hal yang perlu diperbaiki, atau feedback khusus untuk individu...&#10;&#10;Contoh:&#10;- Ahmad: sangat aktif dalam memimpin diskusi&#10;- Siti: presentasi sangat jelas dan meyakinkan&#10;- Budi: perlu lebih berani dalam menyampaikan pendapat"></textarea>
   </div>
 
   <div class="progress-container">
@@ -678,7 +776,7 @@ const RUBRIC_DATA = [
   }
 ];
 
-// Student Data - All classes
+// Student Data - All classes (abbreviated for demo - full data in actual file)
 const STUDENTS_DATA = {
   "A": [
     {"nim": "2410713032", "nama": "Dinda Ramadhani Nazar'Nur", "prodi": "S1 Kesehatan Masyarakat", "angkatan": "2024"},
@@ -928,7 +1026,10 @@ const E = {
   kelasSelect: document.getElementById('kelas'),
   namaInput: document.getElementById('nama-mahasiswa'),
   studentDropdown: document.getElementById('student-dropdown'),
-  selectedStudentsContainer: document.getElementById('selected-students')
+  selectedStudentsContainer: document.getElementById('selected-students'),
+  manualSection: document.getElementById('add-manual-section'),
+  manualNama: document.getElementById('manual-nama'),
+  manualNim: document.getElementById('manual-nim')
 };
 
 // Utility
@@ -966,6 +1067,44 @@ function hideModal() {
   E.confirmModal.classList.remove('show');
   confirmCallback = null;
 }
+
+// Toggle Manual Section
+window.toggleManualSection = function() {
+  E.manualSection.classList.toggle('collapsed');
+};
+
+// Add Manual Student
+window.addManualStudent = function() {
+  const nama = E.manualNama.value.trim();
+  const nim = E.manualNim.value.trim();
+
+  if (!nama) {
+    showToast('Nama mahasiswa wajib diisi', 'error');
+    return;
+  }
+
+  const manualStudent = {
+    nama: nama,
+    nim: nim || 'N/A',
+    prodi: 'Manual',
+    angkatan: '-',
+    isManual: true
+  };
+
+  if (state.selectedStudents.find(s => s.nama.toLowerCase() === nama.toLowerCase())) {
+    showToast('Mahasiswa sudah ditambahkan', 'info');
+    return;
+  }
+
+  state.selectedStudents.push(manualStudent);
+  renderSelectedStudents();
+
+  E.manualNama.value = '';
+  E.manualNim.value = '';
+  E.manualSection.classList.add('collapsed');
+
+  showToast('Mahasiswa manual ditambahkan');
+};
 
 // Student Autocomplete
 function setupStudentAutocomplete() {
@@ -1009,7 +1148,7 @@ function setupStudentAutocomplete() {
     ).slice(0, 10);
 
     if (filteredStudents.length === 0) {
-      E.studentDropdown.innerHTML = '<div class="autocomplete-item" style="cursor:default;">Tidak ditemukan</div>';
+      E.studentDropdown.innerHTML = '<div class="autocomplete-item" style="cursor:default;">Tidak ditemukan. Gunakan "Tambah Manual" untuk siswa tidak terdaftar.</div>';
       E.studentDropdown.classList.add('show');
       return;
     }
@@ -1072,7 +1211,7 @@ function selectStudent(student) {
     E.studentDropdown.classList.remove('show');
     return;
   }
-  state.selectedStudents.push(student);
+  state.selectedStudents.push({...student, isManual: false});
   renderSelectedStudents();
   E.namaInput.value = '';
   E.studentDropdown.classList.remove('show');
@@ -1094,20 +1233,21 @@ function renderSelectedStudents() {
     return;
   }
   E.selectedStudentsContainer.innerHTML = state.selectedStudents.map(s => `
-    <div class="student-tag">
-      <span>${esc(s.nama)}</span>
+    <div class="student-tag ${s.isManual ? 'manual' : ''}">
+      <span>${esc(s.nama)}${s.isManual ? ' (Manual)' : ''}</span>
       <span class="student-tag-remove" onclick="window.removeStudent('${s.nim}')">×</span>
     </div>
   `).join('');
+
   hintEl.textContent = state.selectedStudents.length + '/5 anggota ditambahkan';
-  if (state.selectedStudents.length >= 4 && state.selectedStudents.length <= 5) {
+  if (state.selectedStudents.length >= 2 && state.selectedStudents.length <= 5) {
     hintEl.style.color = 'var(--color-success)';
   } else if (state.selectedStudents.length > 5) {
     hintEl.style.color = 'var(--color-error)';
     hintEl.textContent += ' (terlalu banyak!)';
   } else {
     hintEl.style.color = 'var(--color-warning)';
-    hintEl.textContent += ' (butuh minimal 4)';
+    hintEl.textContent += ' (butuh minimal 2)';
   }
 }
 
@@ -1236,10 +1376,11 @@ function getFormData() {
   const kelas = E.kelasSelect.value;
   const kelompok = document.getElementById('kelompok').value.trim();
   const topik = document.getElementById('topik').value.trim();
+  const feedback = document.getElementById('feedback-notes').value.trim();
 
   if (!kelas) { showToast('Harap pilih Kelas', 'error'); return null; }
-  if (state.selectedStudents.length < 4 || state.selectedStudents.length > 5) {
-    showToast('Harap pilih 4-5 anggota kelompok (saat ini: ' + state.selectedStudents.length + ')', 'error');
+  if (state.selectedStudents.length < 2 || state.selectedStudents.length > 5) {
+    showToast('Harap pilih 2-5 anggota kelompok (saat ini: ' + state.selectedStudents.length + ')', 'error');
     return null;
   }
   if (!kelompok) { showToast('Harap isi Kelompok', 'error'); return null; }
@@ -1255,13 +1396,16 @@ function getFormData() {
 
   const weighted = (c1 * 0.3) + (c2 * 0.4) + (c3 * 0.3);
   const score100 = convertTo100(weighted);
-  const namaList = state.selectedStudents.map(s => `${s.nama} (${s.nim})`).join(', ');
+  const namaList = state.selectedStudents.map(s => `${s.nama}${s.isManual ? ' (Manual)' : ''} (${s.nim})`).join(', ');
+  const manualStudents = state.selectedStudents.filter(s => s.isManual).map(s => s.nama).join(', ');
 
   return {
     kelas, kelompok, namaMahasiswa: namaList, topik,
     skorPresentasi: c1, skorKasus: c2, skorFasilitasi: c3,
     nilaiAkhir: score100,
     grade: getGradeFrom5(weighted),
+    feedback: feedback,
+    manualStudents: manualStudents || '-',
     timestamp: new Date().toLocaleString('id-ID')
   };
 }
@@ -1285,6 +1429,7 @@ function resetForm() {
   E.summaryFinal.className = 'summary-item-value grade';
   E.submitBtn.disabled = true;
 
+  document.getElementById('feedback-notes').value = '';
   renderSelectedStudents();
   updateProgress();
   showToast('Form direset');
