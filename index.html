@@ -1349,21 +1349,31 @@ async function submitToGoogleSheets() {
   const data = getFormData();
   if (!data) return;
 
+  // Debug: log the data being sent
+  console.log('=== DATA BEING SENT ===');
+  console.log(JSON.stringify(data, null, 2));
+  console.log('URL:', GOOGLE_SHEET_URL);
+
   E.submitBtn.classList.add('loading');
   E.submitBtn.disabled = true;
   E.submitBtn.innerHTML = 'Mengirim...';
 
   try {
-    await fetch(GOOGLE_SHEET_URL, {
+    const response = await fetch(GOOGLE_SHEET_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
 
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+
+    // With no-cors, we can't read the response, but if no error was thrown, it likely worked
     showToast('Nilai berhasil dikirim!', 'success');
     resetForm();
   } catch (err) {
+    console.error('ERROR:', err);
     showToast('Gagal mengirim: ' + err.message, 'error');
   } finally {
     E.submitBtn.classList.remove('loading');
